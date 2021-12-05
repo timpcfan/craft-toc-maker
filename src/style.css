@@ -42,3 +42,11 @@ body.dark .btn:hover {
 body.dark .btn:active {
   background-color: #303030;
 }
+
+body.dark p {
+  color: #cfcfcf;
+}
+
+body.dark h2 {
+  color: #cfcfcf;
+}
