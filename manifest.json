@@ -2,9 +2,9 @@
   "id": "site.timpcfan.craft-toc-maker",
   "name": "ToC Maker",
   "fileName": "craft-toc-maker",
-  "author" : "timpcfan",
-  "author-email" : "lztsmail@gmail.com",
-  "description" : "A plugin for making table of contents",
+  "author": "timpcfan",
+  "author-email": "lztsmail@gmail.com",
+  "description": "A plugin for making table of contents",
   "api": "0.1.0",
   "main": "index.html"
 }

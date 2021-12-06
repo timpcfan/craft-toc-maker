@@ -3,23 +3,14 @@
     "baseUrl": ".",
     "inlineSourceMap": true,
     "inlineSources": true,
+    "jsx": "react",
     "module": "amd",
     "target": "es6",
     "strict": true,
     "moduleResolution": "node",
     "importHelpers": true,
-    "lib": [
-      "dom",
-      "esnext"
-    ],
-    "typeRoots": [
-      "./node_modules/@craftdocs/craft-extension-api"
-    ]
+    "lib": ["dom", "esnext"],
+    "typeRoots": ["./node_modules/@craftdocs/craft-extension-api"]
   },
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }
