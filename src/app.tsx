@@ -1,6 +1,7 @@
 import { CraftTextBlock } from "@craftdocs/craft-extension-api";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+import Switch from "./components/switch";
 
 const App: React.FC<{}> = () => {
   const isDarkMode = useCraftDarkMode();
@@ -14,25 +15,58 @@ const App: React.FC<{}> = () => {
   }, [isDarkMode]);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-      }}
-    >
-      <h2>ToC Maker</h2>
-      <p>
-        Press the button below to generate the Table of Contents for current
-        page according to titles.
-      </p>
-      <button
-        className={`btn ${isDarkMode ? "dark" : ""}`}
-        onClick={handleGenerate}
+    <>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
       >
-        Generate!
-      </button>
-    </div>
+        <span className="mt-2 fw-bolder">ToC Maker</span>
+        <div>
+          <hr className="mt-2" />
+          <label className="fw-bold">Basic Contents</label>
+          <Switch id="1" info="Include title" checked={true} />
+          <Switch id="2" info="Include subtitle" checked={true} />
+          <Switch id="3" info="Include heading" checked={true} />
+          <Switch id="4" info="Include strong" checked={true} />
+          <hr />
+          <label className="fw-bold">Advance Contents</label>
+          <Switch id="5" info="Include page blocks" checked={false} />
+          <Switch id="6" info="Include paragraph starters" checked={false} />
+          <hr />
+          <label className="fw-bold">Generate list type</label>
+          <select
+            className="form-select"
+            aria-label="Generate list type select"
+          >
+            <option value="bullet" selected>
+              bullet
+            </option>
+            <option value="toggle">toggle</option>
+            <option value="numbered">numbered</option>
+            <option value="todo">todo</option>
+            <option value="none">none</option>
+          </select>
+          <hr />
+          <label className="fw-bold">Insert position</label>
+          <select className="form-select" aria-label="Insert porsition select">
+            <option value="beginning" selected>
+              At the beginning
+            </option>
+            <option value="end">At the end</option>
+          </select>
+          <hr />
+        </div>
+        <button
+          className={`btn btn-primary mt-3 ${isDarkMode ? "dark" : ""}`}
+          onClick={handleGenerate}
+        >
+          Generate!
+        </button>
+      </div>
+    </>
   );
 };
 

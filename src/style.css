@@ -25,6 +25,7 @@ body.dark {
 body.dark .btn {
   background-color: #464646;
   color: #cfcfcf;
+  border-color: #464646;
 }
 
 .btn:hover {
@@ -48,5 +49,17 @@ body.dark p {
 }
 
 body.dark h2 {
+  color: #cfcfcf;
+}
+
+body.dark label {
+  color: #cfcfcf;
+}
+
+body.dark span {
+  color: #cfcfcf;
+}
+
+body.dark hr {
   color: #cfcfcf;
 }
