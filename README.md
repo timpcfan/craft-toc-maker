@@ -7,6 +7,6 @@ A plugin for [Craft](https://craft.do) to generate Table of Contents according t
 - collapsible ToC
 - can include page blocks
 - can include paragraph starters
-- choose a style (list/table/custom separator)
-- choose a list type (bullet/toggle/number/todo/none)
-- choose insert position (top/bottom)
+- custom style (list/table/custom separator)
+- custom list type (bullet/toggle/number/todo/none)
+- custom insert position (top/bottom)
