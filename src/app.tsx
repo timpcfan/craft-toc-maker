@@ -1,11 +1,10 @@
-import { CraftTextBlock } from "@craftdocs/craft-extension-api";
+import { CraftTextBlock, ListStyleType } from "@craftdocs/craft-extension-api";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import Switch from "./components/switch";
 
 const App: React.FC<{}> = () => {
   const isDarkMode = useCraftDarkMode();
-
   React.useEffect(() => {
     if (isDarkMode) {
       document.body.classList.add("dark");
@@ -24,26 +23,50 @@ const App: React.FC<{}> = () => {
         }}
       >
         <span className="mt-2 fw-bolder">ToC Maker</span>
+
         <div>
           <hr className="mt-2" />
-          <label className="fw-bold">Basic Contents</label>
-          <Switch id="1" info="Include title" checked={true} />
-          <Switch id="2" info="Include subtitle" checked={true} />
-          <Switch id="3" info="Include heading" checked={true} />
-          <Switch id="4" info="Include strong" checked={true} />
+          <label className="fw-bold">Advance Settings</label>
+          <Switch
+            id="switch-collapsible"
+            info="Make collapsible ToC"
+            checked={true}
+            disable={false}
+          />
+          <Switch
+            id="switch-include-page"
+            info="Include page blocks"
+            checked={false}
+            disable={true}
+          />
+          <Switch
+            id="switch-include-starters"
+            info="Include paragraph starters"
+            checked={false}
+            disable={true}
+          />
           <hr />
-          <label className="fw-bold">Advance Contents</label>
-          <Switch id="5" info="Include page blocks" checked={false} />
-          <Switch id="6" info="Include paragraph starters" checked={false} />
+          <label className="fw-bold">ToC style (Comming soon!)</label>
+          <select
+            id="select-toc-style"
+            className="form-select"
+            aria-label="Generate list type select"
+            defaultValue="list"
+            disabled={true}
+          >
+            <option value="list">list</option>
+            <option value="tight">tight</option>
+            <option value="table">table</option>
+          </select>
           <hr />
           <label className="fw-bold">Generate list type</label>
           <select
+            id="select-list-type"
             className="form-select"
             aria-label="Generate list type select"
+            defaultValue="bullet"
           >
-            <option value="bullet" selected>
-              bullet
-            </option>
+            <option value="bullet">bullet</option>
             <option value="toggle">toggle</option>
             <option value="numbered">numbered</option>
             <option value="todo">todo</option>
@@ -51,24 +74,45 @@ const App: React.FC<{}> = () => {
           </select>
           <hr />
           <label className="fw-bold">Insert position</label>
-          <select className="form-select" aria-label="Insert porsition select">
-            <option value="beginning" selected>
-              At the beginning
-            </option>
-            <option value="end">At the end</option>
+          <select
+            id="select-insert-position"
+            className="form-select"
+            aria-label="Insert porsition select"
+            defaultValue="top"
+          >
+            <option value="top">top</option>
+            <option value="bottom">bottom</option>
           </select>
           <hr />
         </div>
-        <button
-          className={`btn btn-primary mt-3 ${isDarkMode ? "dark" : ""}`}
-          onClick={handleGenerate}
-        >
+        <button className={"btn btn-primary mt-3"} onClick={handleGenerate}>
           Generate!
         </button>
       </div>
     </>
   );
 };
+
+function getSettings() {
+  return {
+    collapsible: (
+      document.getElementById("switch-collapsible") as HTMLInputElement
+    ).checked,
+    includePages: (
+      document.getElementById("switch-include-page") as HTMLInputElement
+    ).checked,
+    includeParagraph: (
+      document.getElementById("switch-include-starters") as HTMLInputElement
+    ).checked,
+    tocStyle: (document.getElementById("select-toc-style") as HTMLInputElement)
+      .value,
+    listType: (document.getElementById("select-list-type") as HTMLInputElement)
+      .value,
+    insertPosition: (
+      document.getElementById("select-insert-position") as HTMLInputElement
+    ).value,
+  };
+}
 
 function useCraftDarkMode() {
   const [isDarkMode, setIsDarkMode] = React.useState(false);
@@ -85,7 +129,7 @@ async function handleGenerate() {
   if (result.status !== "success") {
     throw new Error(result.message);
   }
-  console.log(result.data);
+  const settings = getSettings();
   const pageBlock = result.data;
   const titleBlocks = pageBlock.subblocks.filter((x) => {
     return (
@@ -114,6 +158,17 @@ async function handleGenerate() {
     .reduce((pre, cur, _) => Math.min(pre, cur));
 
   const blocksToAdd = [];
+
+  let collapsibleOffset = 0;
+  if (settings.collapsible) {
+    collapsibleOffset = 1;
+    const toggle = craft.blockFactory.textBlock({
+      content: "Table of Contents",
+    });
+    toggle.listStyle = craft.blockFactory.defaultListStyle("toggle");
+    blocksToAdd.push(toggle);
+  }
+
   for (let i = 0; i < titleBlocks.length; i++) {
     let b = titleBlocks[i] as CraftTextBlock;
     const newBlock = craft.blockFactory.textBlock({ content: [] });
@@ -127,14 +182,18 @@ async function handleGenerate() {
         },
       },
     ];
-    newBlock.listStyle = craft.blockFactory.defaultListStyle("bullet");
-    newBlock.indentationLevel = s2ind[b.style.textStyle] - startLevel;
+    newBlock.listStyle = craft.blockFactory.defaultListStyle(
+      settings.listType as ListStyleType
+    );
+    newBlock.indentationLevel =
+      s2ind[b.style.textStyle] - startLevel + collapsibleOffset;
     blocksToAdd.push(newBlock);
   }
-  craft.dataApi.addBlocks(
-    blocksToAdd,
-    craft.location.indexLocation(pageBlock.id, 0)
-  );
+  const location =
+    settings.insertPosition == "top"
+      ? craft.location.indexLocation(pageBlock.id, 0)
+      : undefined;
+  craft.dataApi.addBlocks(blocksToAdd, location);
 }
 
 export function initApp() {
