@@ -1,23 +1,30 @@
 import React = require("react");
 
-const Switch = (porps: {
+interface SwitchProps {
   id: string;
   info: string;
   checked: boolean;
-  disable: boolean;
-}) => {
+  disabled: boolean;
+}
+
+const Switch: React.FunctionComponent<SwitchProps> = ({
+  id,
+  info,
+  checked,
+  disabled,
+}: SwitchProps) => {
   return (
     <div className="form-check form-switch">
       <input
         className="form-check-input"
         type="checkbox"
         role="switch"
-        id={porps.id}
-        defaultChecked={porps.checked}
-        disabled={porps.disable}
+        id={id}
+        defaultChecked={checked}
+        disabled={disabled}
       />
-      <label className="form-check-label" htmlFor={"switch-" + porps.id}>
-        {porps.info}
+      <label className="form-check-label" htmlFor={id}>
+        {info}
       </label>
     </div>
   );
