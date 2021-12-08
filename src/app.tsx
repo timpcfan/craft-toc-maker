@@ -49,10 +49,10 @@ const App: React.FC<{}> = () => {
           <hr />
           <Selector
             id={"select-toc-style"}
-            title={"ToC Style (Comming Soon!)"}
-            items={["list", "tight", "table"]}
+            title={"ToC Style"}
+            items={["list", "tight", "table (Comming Soon!)"]}
             defaultValue={"list"}
-            disabled={true}
+            disabled={false}
           />
           <hr />
           <Selector

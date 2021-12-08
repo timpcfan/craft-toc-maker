@@ -1,6 +1,15 @@
 import React = require("react");
 
-export function getSettings() {
+export interface Settings {
+  collapsible: boolean;
+  includePages: boolean;
+  includeParagraph: boolean;
+  tocStyle: string;
+  listType: string;
+  insertPosition: string;
+}
+
+export function getSettings(): Settings {
   return {
     collapsible: (
       document.getElementById("switch-collapsible") as HTMLInputElement

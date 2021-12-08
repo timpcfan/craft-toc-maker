@@ -1,5 +1,10 @@
-import { CraftTextBlock, ListStyleType } from "@craftdocs/craft-extension-api";
-import { getSettings } from "./utils";
+import {
+  CraftTextBlock,
+  CraftTextBlockInsert,
+  CraftTextRun,
+  ListStyleType,
+} from "@craftdocs/craft-extension-api";
+import { getSettings, Settings } from "./utils";
 
 export default async function handleGenerate() {
   const result = await craft.dataApi.getCurrentPage();
@@ -16,7 +21,41 @@ export default async function handleGenerate() {
         x.style.textStyle === "heading" ||
         x.style.textStyle === "strong")
     );
+  }) as CraftTextBlock[];
+
+  const blocksToAdd: CraftTextBlockInsert[] = [];
+
+  if (settings.collapsible) {
+    addCollapsibleHeader(blocksToAdd);
+  }
+
+  if (settings.tocStyle === "tight") {
+    addTightToC(blocksToAdd, titleBlocks, settings);
+  } else {
+    addListToC(blocksToAdd, titleBlocks, settings);
+  }
+
+  const location =
+    settings.insertPosition === "top"
+      ? craft.location.indexLocation(pageBlock.id, 0)
+      : undefined;
+  craft.dataApi.addBlocks(blocksToAdd, location);
+}
+
+function addCollapsibleHeader(blocksToAdd: CraftTextBlockInsert[]) {
+  const header = craft.blockFactory.textBlock({
+    content: "Table of Contents",
+    style: { textStyle: "title" },
+    listStyle: craft.blockFactory.defaultListStyle("toggle"),
   });
+  blocksToAdd.push(header);
+}
+
+function addListToC(
+  blocksToAdd: CraftTextBlockInsert[],
+  titleBlocks: CraftTextBlock[],
+  settings: Settings
+) {
   const s2ind = {
     title: 0,
     subtitle: 1,
@@ -28,47 +67,56 @@ export default async function handleGenerate() {
     page: 0,
   };
   const startLevel = titleBlocks
-    .map((x) => {
-      let b = x as CraftTextBlock;
-      return s2ind[b.style.textStyle];
-    })
+    .map((x) => s2ind[x.style.textStyle])
     .reduce((pre, cur, _) => Math.min(pre, cur));
 
-  const blocksToAdd = [];
-
-  let collapsibleOffset = 0;
-  if (settings.collapsible) {
-    collapsibleOffset = 1;
-    const toggle = craft.blockFactory.textBlock({
-      content: "Table of Contents",
-    });
-    toggle.listStyle = craft.blockFactory.defaultListStyle("toggle");
-    blocksToAdd.push(toggle);
-  }
-
   for (let i = 0; i < titleBlocks.length; i++) {
-    let b = titleBlocks[i] as CraftTextBlock;
-    const newBlock = craft.blockFactory.textBlock({ content: [] });
-    newBlock.content = [
-      {
-        text: b.content.map((x) => x.text).join(),
-        link: {
-          type: "blockLink",
-          spaceId: b.spaceId as string,
-          blockId: b.id,
+    let b = titleBlocks[i];
+    const newBlock = craft.blockFactory.textBlock({
+      content: [
+        {
+          text: b.content.map((x) => x.text).join(),
+          link: {
+            type: "blockLink",
+            spaceId: b.spaceId as string,
+            blockId: b.id,
+          },
         },
-      },
-    ];
-    newBlock.listStyle = craft.blockFactory.defaultListStyle(
-      settings.listType as ListStyleType
-    );
-    newBlock.indentationLevel =
-      s2ind[b.style.textStyle] - startLevel + collapsibleOffset;
+      ],
+      listStyle: craft.blockFactory.defaultListStyle(
+        settings.listType as ListStyleType
+      ),
+      indentationLevel:
+        s2ind[b.style.textStyle] - startLevel + (settings.collapsible ? 1 : 0),
+    });
     blocksToAdd.push(newBlock);
   }
-  const location =
-    settings.insertPosition == "top"
-      ? craft.location.indexLocation(pageBlock.id, 0)
-      : undefined;
-  craft.dataApi.addBlocks(blocksToAdd, location);
+}
+
+function addTightToC(
+  blocksToAdd: CraftTextBlockInsert[],
+  titleBlocks: CraftTextBlock[],
+  settings: Settings
+) {
+  const content: CraftTextRun[] = [];
+  for (let i = 0; i < titleBlocks.length; i++) {
+    let b = titleBlocks[i];
+    content.push({
+      text: b.content.map((x) => x.text).join(),
+      link: {
+        type: "blockLink",
+        spaceId: b.spaceId as string,
+        blockId: b.id,
+      },
+    });
+    content.push({
+      text: " | ",
+    });
+  }
+  content.pop();
+  const tightBlock = craft.blockFactory.textBlock({
+    content: content,
+    indentationLevel: settings.collapsible ? 1 : 0,
+  });
+  blocksToAdd.push(tightBlock);
 }
