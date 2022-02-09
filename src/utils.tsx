@@ -7,6 +7,7 @@ export interface Settings {
   tocStyle: string;
   listType: string;
   insertPosition: string;
+  includeHeaderLevel: number;
 }
 
 export function getSettings(): Settings {
@@ -27,6 +28,13 @@ export function getSettings(): Settings {
     insertPosition: (
       document.getElementById("select-insert-position") as HTMLInputElement
     ).value,
+    includeHeaderLevel: Number(
+      (
+        document.getElementById(
+          "select-include-header-level"
+        ) as HTMLInputElement
+      ).value
+    ),
   };
 }
 

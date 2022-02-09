@@ -16,10 +16,7 @@ export default async function handleGenerate() {
   const titleBlocks = pageBlock.subblocks.filter((x) => {
     return (
       x.type === "textBlock" &&
-      (x.style.textStyle === "title" ||
-        x.style.textStyle === "subtitle" ||
-        x.style.textStyle === "heading" ||
-        x.style.textStyle === "strong")
+      filterHeaderLevel(x, settings.includeHeaderLevel)
     );
   }) as CraftTextBlock[];
 
@@ -40,6 +37,22 @@ export default async function handleGenerate() {
       ? craft.location.indexLocation(pageBlock.id, 0)
       : undefined;
   craft.dataApi.addBlocks(blocksToAdd, location);
+}
+
+function filterHeaderLevel(x: CraftTextBlock, level: Number): Boolean {
+  const l1 = x.style.textStyle === "title";
+  const l2 = l1 || x.style.textStyle === "subtitle";
+  const l3 = l2 || x.style.textStyle === "heading";
+  const l4 = l3 || x.style.textStyle === "strong";
+  switch (level) {
+    case 1:
+      return l1;
+    case 2:
+      return l2;
+    case 3:
+      return l3;
+  }
+  return l4;
 }
 
 function addCollapsibleHeader(blocksToAdd: CraftTextBlockInsert[]) {

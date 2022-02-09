@@ -20,7 +20,7 @@ const Selector: React.FunctionComponent<SelectorProps> = ({
       <label className="fw-bold">{title}</label>
       <select
         id={id}
-        className="form-select"
+        className="form-select mb-2"
         defaultValue={defaultValue}
         disabled={disabled}
       >

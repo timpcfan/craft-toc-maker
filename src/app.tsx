@@ -48,13 +48,19 @@ const App: React.FC<{}> = () => {
           />
           <hr />
           <Selector
+            id={"select-include-header-level"}
+            title={"Include header level"}
+            items={["1", "2", "3", "4"]}
+            defaultValue={"2"}
+            disabled={false}
+          />
+          <Selector
             id={"select-toc-style"}
             title={"ToC Style"}
             items={["list", "tight", "table (Comming Soon!)"]}
             defaultValue={"list"}
             disabled={false}
           />
-          <hr />
           <Selector
             id={"select-list-type"}
             title={"Generate list type"}
@@ -62,7 +68,6 @@ const App: React.FC<{}> = () => {
             defaultValue={"bullet"}
             disabled={false}
           />
-          <hr />
           <Selector
             id={"select-insert-position"}
             title={"Insert position"}
